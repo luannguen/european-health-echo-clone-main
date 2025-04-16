@@ -8,7 +8,7 @@ channel = "stable-24_05"
 run = ["sh", "-c", "npm run dev"]
 
 [workflows]
-runButton = "Test Suite - Đầy đủ"
+runButton = "Test Admin UI"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -127,6 +127,27 @@ args = "node backend/src/tests/full-api-test.js"
 name = "Test Admin Login Info"
 author = 4868510
 mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node test-admin-ui.js"
+
+[[workflows.workflow]]
+name = "Test Admin UI"
+author = 4868510
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "# Bước 1: Khởi động Backend Server để test Admin UI"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node ./backend/src/server.js &"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "# Bước 2: Hiển thị thông tin đăng nhập và hướng dẫn test"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

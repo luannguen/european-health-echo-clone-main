@@ -105,11 +105,13 @@ function checkPort(port) {
   return new Promise((resolve, reject) => {
     const command = process.platform === 'win32'
       ? `netstat -ano | find "LISTENING" | find ":${port}"`
-      : `lsof -i:${port} | grep LISTEN`;
+      : `netstat -tuln | grep :${port}`;
 
     exec(command, (error, stdout) => {
       if (stdout && stdout.trim() !== '') {
-        reject(new Error(`Port ${port} đã được sử dụng. Vui lòng đóng ứng dụng đang sử dụng port này trước.`));
+        log(`Port ${port} đang được sử dụng. Vite sẽ tự động chọn port khác.`, 'warning');
+        // Resolve anyway to continue as Vite can select another port
+        resolve();
       } else {
         resolve();
       }
@@ -176,11 +178,11 @@ async function startFrontendServer() {
     log(`Vite sẽ tự động sử dụng port khác nếu port ${VITE_PORT} đang bận.`, 'info');
   }
 
-  // PHƯƠNG PHÁP 1: Sử dụng cmd để chạy npm
+  // PHƯƠNG PHÁP 1: Sử dụng npm run dev (cross-platform)
   try {
-    log(`Thử chạy Frontend bằng cmd /c npm run dev...`, 'frontend');
+    log(`Thử chạy Frontend bằng npm run dev...`, 'frontend');
 
-    const frontendServer = spawn('cmd', ['/c', 'npm', 'run', 'dev'], {
+    const frontendServer = spawn('npm', ['run', 'dev'], {
       env: { ...process.env, VITE_PORT },
       stdio: 'pipe',
       shell: true,
@@ -333,7 +335,7 @@ function displayLoginTestInfo() {
   log(`- Password: ${TEST_CREDENTIALS.password}`, 'success');
   
   log('\nHướng dẫn test thủ công:', 'info');
-  log('1. Truy cập URL: http://localhost:8080/login', 'info');
+  log('1. Truy cập URL: http://localhost:8081/login', 'info');
   log('2. Nhập thông tin đăng nhập trên', 'info');  
   log('3. Nhấn nút Đăng nhập', 'info');
   log('4. Kiểm tra nếu đăng nhập thành công và chuyển hướng đến trang Dashboard', 'info');
