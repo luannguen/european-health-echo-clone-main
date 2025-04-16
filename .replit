@@ -8,7 +8,7 @@ channel = "stable-24_05"
 run = ["sh", "-c", "npm run dev"]
 
 [workflows]
-runButton = "Full Stack Dev"
+runButton = "Test Admin UI Login"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -58,6 +58,15 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node backend/src/tests/full-api-test.js"
+
+[[workflows.workflow]]
+name = "Test Admin UI Login"
+author = 4868510
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node test-admin-ui.js"
 
 [[ports]]
 localPort = 3001

@@ -46,7 +46,7 @@ function log(message, type = 'info') {
   const timestamp = new Date().toLocaleTimeString();
   let color = colors.white;
   let prefix = '';
-  
+
   switch (type) {
     case 'success':
       color = colors.green;
@@ -72,7 +72,7 @@ function log(message, type = 'info') {
       color = colors.white;
       prefix = '[INFO]';
   }
-  
+
   console.log(`${color}${prefix} [${timestamp}] ${message}${colors.reset}`);
 }
 
@@ -103,10 +103,10 @@ function showEnvironmentInfo() {
  */
 function checkPort(port) {
   return new Promise((resolve, reject) => {
-    const command = process.platform === 'win32' 
-      ? `netstat -ano | find "LISTENING" | find ":${port}"` 
+    const command = process.platform === 'win32'
+      ? `netstat -ano | find "LISTENING" | find ":${port}"`
       : `lsof -i:${port} | grep LISTEN`;
-    
+
     exec(command, (error, stdout) => {
       if (stdout && stdout.trim() !== '') {
         reject(new Error(`Port ${port} đã được sử dụng. Vui lòng đóng ứng dụng đang sử dụng port này trước.`));
@@ -122,7 +122,7 @@ function checkPort(port) {
  */
 async function startBackendServer() {
   log('Đang khởi động Backend Server...', 'backend');
-  
+
   try {
     await checkPort(BACKEND_PORT);
   } catch (error) {
@@ -136,25 +136,25 @@ async function startBackendServer() {
     stdio: 'pipe',
     shell: true
   });
-  
+
   backendServer.stdout.on('data', (data) => {
     data.toString().split('\n').filter(line => line.trim()).forEach(line => {
       log(line, 'backend');
     });
   });
-  
+
   backendServer.stderr.on('data', (data) => {
     data.toString().split('\n').filter(line => line.trim()).forEach(line => {
       log(line, 'error');
     });
   });
-  
+
   backendServer.on('close', (code) => {
     if (code !== 0) {
       log(`Backend Server đã dừng với mã lỗi ${code}`, 'error');
     }
   });
-  
+
   return new Promise((resolve) => {
     setTimeout(() => {
       log('Backend Server đã khởi động thành công!', 'success');
@@ -168,7 +168,7 @@ async function startBackendServer() {
  */
 async function startFrontendServer() {
   log('Đang khởi động Frontend Dev Server (Vite)...', 'frontend');
-  
+
   try {
     await checkPort(VITE_PORT);
   } catch (error) {
@@ -179,18 +179,18 @@ async function startFrontendServer() {
   // PHƯƠNG PHÁP 1: Sử dụng cmd để chạy npm
   try {
     log(`Thử chạy Frontend bằng cmd /c npm run dev...`, 'frontend');
-    
+
     const frontendServer = spawn('cmd', ['/c', 'npm', 'run', 'dev'], {
       env: { ...process.env, VITE_PORT },
       stdio: 'pipe',
       shell: true,
       cwd: process.cwd()
     });
-    
+
     frontendServer.stdout.on('data', (data) => {
       data.toString().split('\n').filter(line => line.trim()).forEach(line => {
         log(line, 'frontend');
-        
+
         // Kiểm tra xem Vite đã khởi động thành công chưa
         if (line.includes('Local:') && line.includes('http://localhost')) {
           let match = line.match(/http:\/\/localhost:(\d+)/);
@@ -200,13 +200,13 @@ async function startFrontendServer() {
         }
       });
     });
-    
+
     frontendServer.stderr.on('data', (data) => {
       data.toString().split('\n').filter(line => line.trim()).forEach(line => {
         log(line, 'error');
       });
     });
-    
+
     // Đăng ký sự kiện khi process kết thúc
     frontendServer.on('close', (code) => {
       if (code !== 0) {
@@ -214,7 +214,7 @@ async function startFrontendServer() {
         startFrontendWithNpx();
       }
     });
-    
+
     // Kiểm tra sau 5 giây xem frontend đã khởi động thành công chưa
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -239,26 +239,26 @@ async function startFrontendServer() {
 async function startFrontendWithNpx() {
   try {
     log(`Thử khởi động Frontend bằng npx...`, 'frontend');
-    
+
     const frontendServer = spawn('npx', ['vite'], {
       env: { ...process.env, VITE_PORT },
       stdio: 'pipe',
       shell: true,
       cwd: process.cwd()
     });
-    
+
     frontendServer.stdout.on('data', (data) => {
       data.toString().split('\n').filter(line => line.trim()).forEach(line => {
         log(line, 'frontend');
       });
     });
-    
+
     frontendServer.stderr.on('data', (data) => {
       data.toString().split('\n').filter(line => line.trim()).forEach(line => {
         log(line, 'error');
       });
     });
-    
+
     return new Promise((resolve) => {
       setTimeout(() => {
         log('Vui lòng mở browser và truy cập: http://localhost:8081/login', 'success');
@@ -280,17 +280,17 @@ async function startFrontendWithNpx() {
  */
 async function startTestEnvironment() {
   log('🚀 KHỞI ĐỘNG MÔI TRƯỜNG TEST ADMIN UI', 'info');
-  
+
   try {
     // Hiển thị thông tin môi trường
     showEnvironmentInfo();
-    
+
     // Khởi động Backend Server
     await startBackendServer();
-    
+
     // Khởi động Frontend Dev Server
     await startFrontendServer();
-    
+
     log('='.repeat(60), 'info');
     log('🎉 MÔI TRƯỜNG TEST ADMIN UI ĐÃ SẴN SÀNG!', 'success');
     log('='.repeat(60), 'info');
@@ -298,18 +298,119 @@ async function startTestEnvironment() {
     log(`Username: ${config.defaultAdmin.username}`, 'success');
     log(`Password: ${config.defaultAdmin.password}`, 'success');
     log('='.repeat(60), 'info');
-    
+
+
     // Xử lý khi người dùng dừng chương trình
     process.on('SIGINT', () => {
       log('Đang dừng các server...', 'info');
       process.exit(0);
     });
-    
   } catch (error) {
     log(`Lỗi khi khởi động môi trường test: ${error.message}`, 'error');
     process.exit(1);
   }
 }
+
+
+//Chạy test UI
+/**
+ * Test UI cho người dùng
+ * File này chạy các UI test đã được định nghĩa
+ */
+
+import { vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import Login from './src/admin/pages/Login.tsx';
+
+// Thông tin đăng nhập mẫu để test
+const TEST_CREDENTIALS = {
+  username: 'admin',
+  password: 'Admin@123'
+};
+
+// Hàm chạy test đăng nhập
+async function testLoginUI() {
+  log('=== BẮT ĐẦU TEST ĐĂNG NHẬP UI ===', 'info');
+
+  try {
+    // Mock AuthContext để test Login component
+    vi.mock('./src/admin/context/AuthContext', () => ({
+      useAuth: () => ({
+        login: vi.fn().mockResolvedValue(true),
+        isLoading: false,
+        error: null
+      })
+    }));
+
+    // Render component Login
+    const { container } = render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+
+    log('Đã render form đăng nhập', 'info');
+
+    // Kiểm tra các phần tử cơ bản
+    const usernameInput = screen.getByLabelText(/username/i);
+    const passwordInput = screen.getByLabelText(/password/i);
+    const loginButton = screen.getByRole('button', { name: /sign in/i });
+
+    if (usernameInput && passwordInput && loginButton) {
+      log('✅ Form đăng nhập đã hiển thị đầy đủ các trường', 'success');
+    } else {
+      log('❌ Form đăng nhập không hiển thị đầy đủ', 'error');
+    }
+
+    // Nhập thông tin đăng nhập
+    log(`Nhập username: ${TEST_CREDENTIALS.username}`, 'info');
+    fireEvent.change(usernameInput, { target: { value: TEST_CREDENTIALS.username } });
+
+    log(`Nhập password: ${TEST_CREDENTIALS.password}`, 'info');
+    fireEvent.change(passwordInput, { target: { value: TEST_CREDENTIALS.password } });
+
+    // Click button đăng nhập
+    log('Click nút đăng nhập', 'info');
+    fireEvent.click(loginButton);
+
+    // Kiểm tra xem form đã được submit chưa
+    await waitFor(() => {
+      const auth = require('./src/admin/context/AuthContext');
+      if (auth.useAuth().login.mock.calls.length > 0) {
+        log('✅ Form đã được submit thành công', 'success');
+        log('Thông tin đăng nhập đã sử dụng:', 'info');
+        log(`- Username: ${TEST_CREDENTIALS.username}`, 'info');
+        log(`- Password: ${TEST_CREDENTIALS.password}`, 'info');
+      } else {
+        log('❌ Form chưa được submit', 'error');
+      }
+    });
+
+    log('=== KẾT THÚC TEST ĐĂNG NHẬP UI ===', 'info');
+    return true;
+  } catch (error) {
+    log('Lỗi khi test UI:', 'error', error);
+    return false;
+  }
+}
+
+// Chạy test
+log('Bắt đầu chạy test UI cho người dùng...', 'info');
+testLoginUI()
+  .then(success => {
+    if (success) {
+      log('\nThông tin đăng nhập mẫu:', 'info');
+      log('- Username:', 'info', TEST_CREDENTIALS.username);
+      log('- Password:', 'info', TEST_CREDENTIALS.password);
+
+      log('\nLưu ý: Đây là thông tin mẫu cho mục đích test. Trong môi trường thực tế,', 'info');
+      log('thông tin đăng nhập sẽ được lấy từ cơ sở dữ liệu.', 'info');
+    }
+  })
+  .catch(err => {
+    log('Không thể chạy test:', 'error', err);
+  });
 
 // Khởi chạy môi trường test
 startTestEnvironment();
