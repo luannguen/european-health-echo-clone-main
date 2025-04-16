@@ -31,3 +31,11 @@ args = "npm run dev"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node ./backend/src/server.js"
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
+
+[[ports]]
+localPort = 8080
+externalPort = 80
