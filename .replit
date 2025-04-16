@@ -8,7 +8,7 @@ channel = "stable-24_05"
 run = ["sh", "-c", "npm run dev"]
 
 [workflows]
-runButton = "Test Admin UI Login"
+runButton = "Test Suite - Đầy đủ"
 
 [[workflows.workflow]]
 name = "Dev Server"
@@ -61,6 +61,70 @@ args = "node backend/src/tests/full-api-test.js"
 
 [[workflows.workflow]]
 name = "Test Admin UI Login"
+author = 4868510
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node test-admin-ui.js"
+
+[[workflows.workflow]]
+name = "Test Suite - Đầy đủ"
+author = 4868510
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "# Bước 1: Kiểm tra kết nối đến CSDL"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node test-db-connection.js"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = ""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "# Bước 2: Kiểm tra API và services"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node backend/src/tests/full-api-test.js"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = ""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "# Bước 3: Đủ điều kiện khởi động môi trường đầy đủ để test UI"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node ./backend/src/server.js & npm run dev"
+
+[[workflows.workflow]]
+name = "Test DB Connection Only"
+author = 4868510
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node test-db-connection.js"
+
+[[workflows.workflow]]
+name = "Test API Only"
+author = 4868510
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node backend/src/tests/full-api-test.js"
+
+[[workflows.workflow]]
+name = "Test Admin Login Info"
 author = 4868510
 mode = "sequential"
 

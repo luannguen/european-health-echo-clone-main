@@ -315,13 +315,9 @@ async function startTestEnvironment() {
 //Chạy test UI
 /**
  * Test UI cho người dùng
- * File này chạy các UI test đã được định nghĩa
+ * File này không thể trực tiếp chạy UI tests từ Node.js
+ * Thay vào đó, hiển thị thông tin đăng nhập và hướng dẫn test thủ công
  */
-
-import { vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import Login from './src/admin/pages/Login.tsx';
 
 // Thông tin đăng nhập mẫu để test
 const TEST_CREDENTIALS = {
@@ -329,88 +325,31 @@ const TEST_CREDENTIALS = {
   password: 'Admin@123'
 };
 
-// Hàm chạy test đăng nhập
-async function testLoginUI() {
-  log('=== BẮT ĐẦU TEST ĐĂNG NHẬP UI ===', 'info');
-
-  try {
-    // Mock AuthContext để test Login component
-    vi.mock('./src/admin/context/AuthContext', () => ({
-      useAuth: () => ({
-        login: vi.fn().mockResolvedValue(true),
-        isLoading: false,
-        error: null
-      })
-    }));
-
-    // Render component Login
-    const { container } = render(
-      <BrowserRouter>
-        <Login />
-      </BrowserRouter>
-    );
-
-    log('Đã render form đăng nhập', 'info');
-
-    // Kiểm tra các phần tử cơ bản
-    const usernameInput = screen.getByLabelText(/username/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const loginButton = screen.getByRole('button', { name: /sign in/i });
-
-    if (usernameInput && passwordInput && loginButton) {
-      log('✅ Form đăng nhập đã hiển thị đầy đủ các trường', 'success');
-    } else {
-      log('❌ Form đăng nhập không hiển thị đầy đủ', 'error');
-    }
-
-    // Nhập thông tin đăng nhập
-    log(`Nhập username: ${TEST_CREDENTIALS.username}`, 'info');
-    fireEvent.change(usernameInput, { target: { value: TEST_CREDENTIALS.username } });
-
-    log(`Nhập password: ${TEST_CREDENTIALS.password}`, 'info');
-    fireEvent.change(passwordInput, { target: { value: TEST_CREDENTIALS.password } });
-
-    // Click button đăng nhập
-    log('Click nút đăng nhập', 'info');
-    fireEvent.click(loginButton);
-
-    // Kiểm tra xem form đã được submit chưa
-    await waitFor(() => {
-      const auth = require('./src/admin/context/AuthContext');
-      if (auth.useAuth().login.mock.calls.length > 0) {
-        log('✅ Form đã được submit thành công', 'success');
-        log('Thông tin đăng nhập đã sử dụng:', 'info');
-        log(`- Username: ${TEST_CREDENTIALS.username}`, 'info');
-        log(`- Password: ${TEST_CREDENTIALS.password}`, 'info');
-      } else {
-        log('❌ Form chưa được submit', 'error');
-      }
-    });
-
-    log('=== KẾT THÚC TEST ĐĂNG NHẬP UI ===', 'info');
-    return true;
-  } catch (error) {
-    log('Lỗi khi test UI:', 'error', error);
-    return false;
-  }
+// Hàm hiển thị thông tin test đăng nhập
+function displayLoginTestInfo() {
+  log('=== THÔNG TIN TEST ĐĂNG NHẬP UI ===', 'info');
+  log('\nThông tin đăng nhập admin:', 'info');
+  log(`- Username: ${TEST_CREDENTIALS.username}`, 'success');
+  log(`- Password: ${TEST_CREDENTIALS.password}`, 'success');
+  
+  log('\nHướng dẫn test thủ công:', 'info');
+  log('1. Truy cập URL: http://localhost:8080/login', 'info');
+  log('2. Nhập thông tin đăng nhập trên', 'info');  
+  log('3. Nhấn nút Đăng nhập', 'info');
+  log('4. Kiểm tra nếu đăng nhập thành công và chuyển hướng đến trang Dashboard', 'info');
+  
+  log('\nHoặc chạy test tự động từ môi trường React với lệnh:', 'info');
+  log('npm test -- src/admin/__tests__/LoginUI.test.js', 'success');
+  
+  log('\nLưu ý: Đây là thông tin test. Trong môi trường thực tế,', 'info');
+  log('thông tin đăng nhập sẽ được lấy từ cơ sở dữ liệu.', 'info');
+  
+  return true;
 }
 
-// Chạy test
-log('Bắt đầu chạy test UI cho người dùng...', 'info');
-testLoginUI()
-  .then(success => {
-    if (success) {
-      log('\nThông tin đăng nhập mẫu:', 'info');
-      log('- Username:', 'info', TEST_CREDENTIALS.username);
-      log('- Password:', 'info', TEST_CREDENTIALS.password);
-
-      log('\nLưu ý: Đây là thông tin mẫu cho mục đích test. Trong môi trường thực tế,', 'info');
-      log('thông tin đăng nhập sẽ được lấy từ cơ sở dữ liệu.', 'info');
-    }
-  })
-  .catch(err => {
-    log('Không thể chạy test:', 'error', err);
-  });
+// Hiển thị thông tin test
+log('Bắt đầu hiển thị thông tin test cho người dùng...', 'info');
+displayLoginTestInfo();
 
 // Khởi chạy môi trường test
 startTestEnvironment();
