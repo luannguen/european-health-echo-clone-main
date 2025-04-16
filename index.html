@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VRC - Tổng công ty kỹ thuật điện lạnh Việt Nam</title>
+    <meta name="description" content="VRC - Tổng công ty kỹ thuật điện lạnh Việt Nam - Giải pháp điện lạnh toàn diện cho mọi công trình" />
+    <meta name="author" content="VRC - Tổng công ty kỹ thuật điện lạnh Việt Nam" />
+
+    <!-- Use absolute path for favicon -->
+    <link rel="icon" href="/assets/svg/logo.svg" type="image/svg+xml" />
+    
+    <meta property="og:title" content="VRC - Tổng công ty kỹ thuật điện lạnh Việt Nam" />
+    <meta property="og:description" content="Giải pháp điện lạnh toàn diện cho mọi công trình dân dụng và công nghiệp" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@vrcdienlanhvn" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    
+    <!-- Error handler to display JavaScript errors -->
+    <script>
+      window.addEventListener('error', function(event) {
+        console.error('Error:', event.error);
+        if (!document.getElementById('js-error-display')) {
+          const errorDiv = document.createElement('div');
+          errorDiv.id = 'js-error-display';
+          errorDiv.style.position = 'fixed';
+          errorDiv.style.top = '10px';
+          errorDiv.style.left = '10px';
+          errorDiv.style.right = '10px';
+          errorDiv.style.backgroundColor = 'rgba(255,0,0,0.8)';
+          errorDiv.style.color = 'white';
+          errorDiv.style.padding = '10px';
+          errorDiv.style.zIndex = '9999';
+          errorDiv.style.fontFamily = 'monospace';
+          errorDiv.style.fontSize = '12px';
+          errorDiv.style.whiteSpace = 'pre-wrap';
+          errorDiv.style.maxHeight = '200px';
+          errorDiv.style.overflow = 'auto';
+          document.body.appendChild(errorDiv);
+        }
+        const errorDisplay = document.getElementById('js-error-display');
+        errorDisplay.textContent += `Error: ${event.error?.message || event.message}\nAt: ${event.filename}:${event.lineno}:${event.colno}\n\n`;
+        return false;
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    
+    <!-- Fallback for older browsers -->
+    <script nomodule>
+      document.getElementById('root').innerHTML = 
+        '<div style="padding: 20px; text-align: center;">' +
+        '<h1>Browser Not Supported</h1>' +
+        '<p>Your browser does not support JavaScript modules. Please upgrade to a modern browser.</p>' +
+        '</div>';
+    </script>
+    
+    <!-- External module script -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    
+    <!-- Main application script with error handling -->
+    <script type="module">
+      try {
+        import('/src/main.tsx')
+          .catch(error => {
+            console.error('Failed to load main module:', error);
+            const rootElement = document.getElementById('root');
+            rootElement.innerHTML = 
+              '<div style="padding: 20px; text-align: center;">' +
+              '<h1>Loading Error</h1>' +
+              '<p>Failed to load the application. Please check browser console for details.</p>' +
+              '<p style="color: red; font-family: monospace;">' + error.message + '</p>' +
+              '</div>';
+          });
+      } catch (error) {
+        console.error('Initial import error:', error);
+      }
+    </script>
+  </body>
+</html>
