@@ -32,6 +32,15 @@ args = "npm run dev"
 task = "shell.exec"
 args = "node ./backend/src/server.js"
 
+[[workflows.workflow]]
+name = "Test API"
+author = 4868510
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend/src/tests && node full-api-test.js"
+
 [[ports]]
 localPort = 3001
 externalPort = 3001
@@ -39,3 +48,7 @@ externalPort = 3001
 [[ports]]
 localPort = 8080
 externalPort = 80
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
